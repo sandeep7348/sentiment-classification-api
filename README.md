@@ -131,6 +131,4 @@ pytest tests/ -v --cov=.
 - [Amazon Product Reviews](https://nijianmo.github.io/amazon/)
 - [SemEval-2017 Task 4](https://alt.qcri.org/semeval2017/task4/)
 
----
-
-## License
+-
