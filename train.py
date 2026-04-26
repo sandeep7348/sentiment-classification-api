@@ -36,7 +36,7 @@ LABELS     = ["negative", "neutral", "positive"]
 
 # ── Data loading ───────────────────────────────────────────────
 def load_data(path: str):
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, engine="python", on_bad_lines="skip")
     assert {"text", "label"}.issubset(df.columns), "CSV must have 'text' and 'label' columns"
     df["text"]  = batch_clean(df["text"].tolist())
     df["label"] = df["label"].map({l: i for i, l in enumerate(LABELS)})
