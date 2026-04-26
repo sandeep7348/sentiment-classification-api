@@ -134,5 +134,3 @@ pytest tests/ -v --cov=.
 ---
 
 ## License
-
-MIT
