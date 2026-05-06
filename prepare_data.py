@@ -19,9 +19,24 @@ def download_datasets():
 
     datasets = [
     ("kazanova/sentiment140", "data/raw"),
+
     ("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews", "data/raw"),
+
     ("snap/amazon-fine-food-reviews", "data/raw"),
+
     ("crowdflower/twitter-airline-sentiment", "data/raw"),
+
+    ("yelp-dataset/yelp-dataset", "data/raw"),
+
+    ("andrewmvd/steam-reviews", "data/raw"),
+
+    ("nicapotato/womens-ecommerce-clothing-reviews", "data/raw"),
+
+    ("ankurzing/sentiment-analysis-for-financial-news", "data/raw"),
+
+    ("cosmos98/twitter-and-reddit-sentimental-analysis-dataset", "data/raw"),
+
+    ("praveengovi/emotions-dataset-for-nlp", "data/raw"),
 ]
 
     for dataset, path in datasets:
