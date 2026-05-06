@@ -18,10 +18,11 @@ def download_datasets():
     import subprocess
 
     datasets = [
-        ("kazanova/sentiment140",                          "data/raw"),
-        ("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews", "data/raw"),
-        ("snap/amazon-fine-food-reviews",                  "data/raw"),
-    ]
+    ("kazanova/sentiment140", "data/raw"),
+    ("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews", "data/raw"),
+    ("snap/amazon-fine-food-reviews", "data/raw"),
+    ("crowdflower/twitter-airline-sentiment", "data/raw"),
+]
 
     for dataset, path in datasets:
         name = dataset.split("/")[-1]
