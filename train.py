@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 # ── Hyperparameters ────────────────────────────────────────────
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-EPOCHS     = 5
+EPOCHS     = 7
 BATCH_SIZE = 32
 LR         = 2e-5
 MAX_LEN    = 128
