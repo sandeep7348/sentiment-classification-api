@@ -7,6 +7,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 
 # ── Directories ────────────────────────────────────────────────
+
 RAW_DIR = Path("data/raw")
 PROC_DIR = Path("data/processed")
 
@@ -15,10 +16,13 @@ PROC_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ── Step 1: Download from Kaggle ───────────────────────────────
+
 def download_datasets():
+
     import subprocess
 
     datasets = [
+
         ("kazanova/sentiment140", "data/raw"),
 
         ("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews", "data/raw"),
@@ -47,9 +51,11 @@ def download_datasets():
         zip_path = Path(path) / f"{name}.zip"
 
         if zip_path.exists():
+
             print(f"Already downloaded: {name}")
 
         else:
+
             print(f"Downloading {name} ...")
 
             result = subprocess.run(
@@ -64,7 +70,7 @@ def download_datasets():
             else:
                 print("  Done.")
 
-        # Unzip
+        # Unzip dataset
         if zip_path.exists():
 
             print(f"Unzipping {zip_path.name} ...")
@@ -75,14 +81,16 @@ def download_datasets():
             print(f"  Extracted to {path}/")
 
 
-# ── Step 2: Load & normalise datasets ──────────────────────────
+# ── Step 2: Load & normalize datasets ─────────────────────────
 
 def load_sentiment140() -> pd.DataFrame:
 
     path = RAW_DIR / "training.1600000.processed.noemoticon.csv"
 
     if not path.exists():
+
         print("  [SKIP] Sentiment140 CSV not found.")
+
         return pd.DataFrame()
 
     df = pd.read_csv(
@@ -114,7 +122,9 @@ def load_imdb() -> pd.DataFrame:
     path = RAW_DIR / "IMDB Dataset.csv"
 
     if not path.exists():
+
         print("  [SKIP] IMDb CSV not found.")
+
         return pd.DataFrame()
 
     df = pd.read_csv(path)
@@ -134,7 +144,9 @@ def load_imdb() -> pd.DataFrame:
     df = df.rename(columns=col_map)
 
     if "text" not in df.columns or "label" not in df.columns:
+
         print("  [SKIP] IMDb missing required columns.")
+
         return pd.DataFrame()
 
     df = df[["text", "label"]].dropna()
@@ -149,7 +161,9 @@ def load_amazon() -> pd.DataFrame:
     path = RAW_DIR / "Reviews.csv"
 
     if not path.exists():
+
         print("  [SKIP] Amazon Reviews CSV not found.")
+
         return pd.DataFrame()
 
     df = pd.read_csv(path, usecols=["Text", "Score"])
@@ -181,7 +195,9 @@ def load_airline() -> pd.DataFrame:
     path = RAW_DIR / "Tweets.csv"
 
     if not path.exists():
+
         print("  [SKIP] Airline CSV not found.")
+
         return pd.DataFrame()
 
     df = pd.read_csv(path)
@@ -193,11 +209,11 @@ def load_airline() -> pd.DataFrame:
 
     df = df[["text", "label"]].dropna()
 
-    # Oversample neutral class
+    # Oversample neutral rows
     neutral = df[df["label"] == "neutral"]
 
     neutral = neutral.sample(
-        min(15000, len(neutral)),
+        30000,
         replace=True,
         random_state=42
     )
@@ -211,6 +227,41 @@ def load_airline() -> pd.DataFrame:
     return df
 
 
+def load_financial() -> pd.DataFrame:
+
+    path = RAW_DIR / "all-data.csv"
+
+    if not path.exists():
+
+        print("  [SKIP] Financial CSV not found.")
+
+        return pd.DataFrame()
+
+    try:
+
+        df = pd.read_csv(
+            path,
+            names=["label", "text"],
+            encoding="latin-1"
+        )
+
+    except:
+
+        return pd.DataFrame()
+
+    df = df[["text", "label"]].dropna()
+
+    df = df[df["label"].isin([
+        "positive",
+        "negative",
+        "neutral"
+    ])]
+
+    print(f"  Financial    : {len(df):,} rows")
+
+    return df
+
+
 # ── Step 3: Merge, clean, balance, save ───────────────────────
 
 def build_dataset():
@@ -218,10 +269,16 @@ def build_dataset():
     print("\nLoading datasets ...")
 
     parts = [
+
         load_sentiment140(),
+
         load_imdb(),
+
         load_amazon(),
+
         load_airline(),
+
+        load_financial(),
     ]
 
     df = pd.concat(
@@ -234,7 +291,10 @@ def build_dataset():
 
     df = df[df["text"].str.len() > 5]
 
-    df = df.drop_duplicates(subset="text")
+    # Keep duplicates only if label differs
+    df = df.drop_duplicates(
+        subset=["text", "label"]
+    )
 
     # Shuffle
     df = df.sample(
@@ -248,7 +308,7 @@ def build_dataset():
 
     print(df["label"].value_counts().to_string())
 
-    # Save merged file
+    # Save merged dataset
     out = PROC_DIR / "train.csv"
 
     df.to_csv(out, index=False)
@@ -258,7 +318,7 @@ def build_dataset():
     return df
 
 
-# ── Step 4: Train / Val / Test Split ──────────────────────────
+# ── Step 4: Split train / val / test ──────────────────────────
 
 def split_and_save(df: pd.DataFrame):
 
@@ -283,8 +343,11 @@ def split_and_save(df: pd.DataFrame):
     )
 
     for split, texts, labels in [
+
         ("train", X_train, y_train),
+
         ("val", X_val, y_val),
+
         ("test", X_test, y_test),
     ]:
 
